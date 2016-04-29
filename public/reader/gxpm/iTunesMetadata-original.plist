@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>artistName</key>
+	<string>朱宁</string>
+	<key>book-info</key>
+	<dict>
+		<key>cover-image-hash</key>
+		<string>E86E80E89AC4A86A695501A833CC4234</string>
+		<key>cover-image-path</key>
+		<string>OEBPS/Images/cover.jpg</string>
+		<key>mime-type</key>
+		<string>application/epub+zip</string>
+		<key>package-file-hash</key>
+		<string>E2E707716A863000EAF0F0E5B80E5DC4</string>
+		<key>publisher-unique-id</key>
+		<string>urn:uuid:7cc1f02b-a734-4e9e-ba1e-5bc63345fd0f</string>
+		<key>unique-id</key>
+		<integer>-949280330888722294</integer>
+		<key>update-level</key>
+		<integer>2</integer>
+	</dict>
+	<key>itemName</key>
+	<string>刚性泡沫</string>
+	<key>playlistName</key>
+	<string>刚性泡沫</string>
+	<key>releaseDate</key>
+	<string>2016-01-08</string>
+</dict>
+</plist>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>BKAllocatedSize</key>
+	<integer>1032192</integer>
+	<key>BKDisplayName</key>
+	<string>刚性泡沫</string>
+	<key>BKGenerationCount</key>
+	<integer>2</integer>
+	<key>BKInsertionDate</key>
+	<integer>478517036</integer>
+	<key>artistName</key>
+	<string>朱宁</string>
+	<key>book-info</key>
+	<dict>
+		<key>package-file-hash</key>
+		<string>E2E707716A863000EAF0F0E5B80E5DC4</string>
+	</dict>
+	<key>isPreview</key>
+	<false/>
+	<key>itemName</key>
+	<string>刚性泡沫</string>
+	<key>versionNumber</key>
+	<real>0.0</real>
+</dict>
+</plist>
