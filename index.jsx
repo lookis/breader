@@ -1,7 +1,10 @@
-require("./node_modules/bootstrap/dist/css/bootstrap.min.css");
-require("./style.css");
+require("./static/menu.css");
+require("./static/style.css");
+require("./static/introduction.css");
+require("./static/payment.css");
+require("./static/guide.css");
 window.jQuery = window.$ = require("./node_modules/jquery/dist/jquery.min.js");
-require("./node_modules/bootstrap/dist/js/bootstrap.min.js");
+
 window.RSVP = require("./node_modules/rsvp/dist/rsvp.js");
 window.ePub = require("./node_modules/epubjs/build/epub.js");
 window.JSZip = require("jszip")
@@ -17,7 +20,7 @@ const appId = "wx6a3e59d1061ba5b4"
 const shareTitle = "ShareTitle"
 const shareDescription = "ShareDescription"
 const shareImg = "http://LiNk"
-const introduction = "我参加了这个接力阅读的游戏！看谁读的远。我参加了这个接力阅读的游戏！看谁读的远。我参加了这个接力阅读的游戏！看谁读的远。我参加了这个接力阅读的游戏！看谁读的远。我参加了这个接力阅读的游戏！看谁读的远。我参加了这个接力阅读的游戏！看谁读的远。"
+const introduction = "我参加了这个接力阅读的游戏！看谁读的远。"
 
 export class App extends React.Component {
   constructor(props) {
@@ -28,18 +31,21 @@ export class App extends React.Component {
       balance: 0,
       id: this.props.params.doc,
       doc: undefined,
+      cover: undefined,
+      author: undefined,
+      book_name: undefined,
       progress: 0,
       total: 0,
       rank: []
     }
   }
   handleSwipeUp(e) {
-    $(".black-cover").show();
-    $(".black-cover").animate({
+    $(".menu-cover").show();
+    $(".menu-cover").animate({
       'opacity': 0.6,
     },{duration:200,queue:false,
     specialEasing:{'bottom': 'linear', 'opacity':'linear'}});
-    $("#profile").animate({
+    $(".menu").animate({
        'bottom': 0,
        'height': "90%",
        'opacity': 1
@@ -47,18 +53,18 @@ export class App extends React.Component {
     specialEasing:{'bottom': 'linear', 'opacity':'linear'}});
   }
   handleSwipeDown(e) {
-    $(".black-cover").animate({
+    $(".menu-cover").animate({
       'opacity': 0,
     },{
       duration:200,
       queue:false,
       specialEasing:{'bottom': 'linear', 'opacity':'linear'},
       complete: function(){
-        $(".black-cover").hide();
+        $(".menu-cover").hide();
       }
     });
-    $("#profile").animate({
-       'bottom': -$("#profile").outerHeight(true),
+    $(".menu").animate({
+       'bottom': -$(".menu").outerHeight(true),
        'height': "0%",
        'opacity': 0
     },{duration:200,queue:false,
@@ -66,15 +72,18 @@ export class App extends React.Component {
   }
   componentDidMount() {
     var self = this;
-    $("#profile").css({
-      'bottom': -$("#profile").outerHeight(true)
+    $(".menu").css({
+      'bottom': -$(".menu").outerHeight(true)
     });
     $.get({
       url: "/api/doc/" + self.state.id,
       success: function(resp){
         if (resp.code == "ok"){
           self.setState({
-            doc: "reader/" + resp.ret
+            doc: "reader/" + resp.ret.file,
+            author: resp.ret.author,
+            cover: "/" + resp.ret.cover,
+            book_name: resp.ret.name
           })
         }else{
           alert(resp);
@@ -88,6 +97,22 @@ export class App extends React.Component {
     mc.on("swipedown", this.handleSwipeDown);
     this.reloadUserRank();
     this.reloadUserInfo();
+    var height = $(".progress").width();
+    $(".progress").height(height);
+    $(".progress").width(height);
+    $(".circle-left, .left").css({
+      clip: "rect(0 " + (height/2) + "px " + height + "px 0)"
+    })
+    $(".circle-right, .right").css({
+      clip: "rect(0 " + height + "px " + height + "px " +(height/2)+ "px)"
+    })
+    $(".clip").height(height-4);
+    $(".clip").width(height-4);
+    window.alert = this.handleOpenAlert;
+    $("#container").css({
+      'height': $(window).height(),
+      'width': $(window).width()
+    })
   }
   reloadUserRank(){
     var self = this;
@@ -99,7 +124,15 @@ export class App extends React.Component {
             progress: resp.ret.me,
             total: resp.ret.total,
             rank: resp.ret.rank
-          })
+          });
+          var num = (resp.ret.me/resp.ret.total * 100).toFixed(0) * 3.6;
+          if (num<=180) {
+              $('.right').css('transform', "rotate(" + num + "deg)");
+          } else {
+              $('.right').css('transform', "rotate(180deg)");
+              $('.left').css('transform', "rotate(" + (num - 180) + "deg)");
+          };
+
         }
       }
     })
@@ -127,39 +160,76 @@ export class App extends React.Component {
   handleTopup(e){
     window.location.replace("/"+this.props.params.doc+"/payment");
   }
+  handleCloseAlert(e){
+    $(".alert").hide();
+    $(".alert-cover").hide();
+  }
+  handleOpenAlert(){
+    var str = ' '
+    for (var i = 0; i < arguments.length; i++) {
+        str += arguments[i] + ' ';
+    }
+    $(".alert-body > div").text(str);
+    $(".alert").show();
+    $(".alert-cover").show();
+  }
   render() {
       return (
           <div id="container">
             {this.props.children && this.state.doc && React.cloneElement(this.props.children, $.extend(this.state, {reloadUserRank: this.reloadUserRank.bind(this), reloadUserInfo: this.reloadUserInfo.bind(this), handleShare: this.handleShare.bind(this)}))}
-            <div className="black-cover" />
-            <div id="profile">
-              <div className="row">
-                <div className="center-block col-xs-5 col-sm-5 col-md-5 col-lg-5">
-                  <img src={this.state.headimg.replace(/0$/, '64')}/>
-                  <h4>{this.state.name}</h4>
+            <div className="black-cover menu-cover" />
+            <div className="menu">
+              <div className="profile">
+                <div className="info">
+                  <div className="user">
+                    <img src={this.state.headimg.replace(/0$/, '64')}/>
+                    <div>
+                      <span>余额：{this.state.balance}</span>
+                      <span>{this.state.name}</span>
+                    </div>
+                  </div>
+                  <div className="dashboard">
+                    <button onClick={this.handleTopup.bind(this)}>充值</button>
+                    <button onClick={this.handleShare.bind(this)}>分享</button>
+                  </div>
                 </div>
-                <div className="col-xs-7 col-sm-7 col-md-7 col-lg-7">
-                  <h5>进度：{this.state.progress}/{this.state.total}</h5>
-                  <h5>余额：{this.state.balance}</h5>
-                  <div className="justify-center">
-                    <button className="btn btn-sm btn-default" onClick={this.handleTopup.bind(this)}>充值</button>
-                    <button className="btn btn-sm btn-default" onClick={this.handleShare.bind(this)}>分享</button>
+                <div className="progress">
+                  <div className="circle-left">
+                    <div className="left"></div>
+                  </div>
+                  <div className="circle-right">
+                    <div className="right"></div>
+                  </div>
+                  <div className="clip">
+                    <div className="progress-word">
+                      <span>{(this.state.progress/this.state.total * 100).toFixed(0)}%</span>
+                      <span>{this.state.progress}/{this.state.total}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-              <hr/>
-              <table className="table table-striped table-content">
-                <tbody>
+              <div className="rank">
                 {this.state.rank.map(function(r, i){
                   return (
-                    <tr key={r.id}>
-                      <td>{i + 1}</td>
-                      <td>{r.name}</td>
-                      <td>{r.progress}</td>
-                    </tr>
-                  )})}
-                </tbody>
-              </table>
+                    <div className={"rank_" + (i+1)} key={r.id}>
+                      <div className="figure" ></div>
+                      <div className="rank_detail">
+                        <div className="progress-bar" style={{width: (r.progress/this.state.total * 100).toFixed(0) + "%"}}></div>
+                        <div className="name">
+                          <span>{r.name}</span>
+                          <span>{r.progress}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}, this)}
+              </div>
+            </div>
+            <div className="black-cover alert-cover" />
+            <div className="alert">
+              <div className="alert-body">
+                <div>Hello World.</div>
+                <button onClick={this.handleCloseAlert.bind(this)}>知道了</button>
+              </div>
             </div>
           </div>
       );
@@ -250,22 +320,21 @@ class Introduction extends React.Component {
   constructor(props){
     super(props);
   }
-  componentDidMount() {
-    $("#introduction").css({
-      'height': $(window).height()-40,
-      'width': $(window).width()-40
-    })
-  }
   handleStart() {
     window.location.replace("/"+this.props.id+"/guide");
   }
   render() {
     return (
       <div id="introduction">
-        {this.props.name}！{introduction}
-        <div className="center-block">
-          <button className="btn btn-default" onClick={this.handleStart.bind(this)}>开始阅读</button>
+        <div className="introduction-cover"></div>
+        <img src={this.props.headimg.replace(/0$/, '64')}/>
+        <div className="introduction-name">
+          {this.props.name}
         </div>
+        <div className="introduction-content">
+          {introduction}
+        </div>
+        <button onClick={this.handleStart.bind(this)}>开始阅读</button>
       </div>
     )
   }
@@ -276,8 +345,10 @@ class Guide extends React.Component {
     constructor(props) {
         super(props);
     }
+    componentDidMount() {
+           
+    }
     handleNext(e){
-      console.log("Click");
       var e = $(".guide.show");
       var next = e.next();
       e.removeClass("show");
@@ -287,11 +358,17 @@ class Guide extends React.Component {
         window.location.replace("/"+this.props.id+"/read");
       }
     }
+    handleStart(e){
+      window.location.replace("/"+this.props.id+"/read");
+    }
     render() {
-        return (<div>
-            <div className="pager guide prev show" onClick={this.handleNext.bind(this)}> </div>
-            <div className="pager guide next" onClick={this.handleNext.bind(this)}> </div>
-            <div className="pager guide bottom" onClick={this.handleNext.bind(this)}> </div>
+        return (<div className="cover-page" onClick={this.handleStart.bind(this)}>
+            <div className="cover-body center-block">
+                <img className="cover" src={this.props.cover} />
+                <div className="book-name" >{this.props.book_name}</div>
+                <div className="book-author" >{this.props.author}</div>
+            </div>
+            <div className="cover-footer"></div>
           </div>);
     }
 }
@@ -350,13 +427,23 @@ class PaymentPage extends React.Component {
       })
     }
     render() {
-      return <div><a onClick={this.handlePayment.bind(this)}>Payment!</a>
-        {this.state.qrcode ? (
-            <QRCode value={this.state.qrcode} />
+      return (<div className="payment">
+        <div className="payment-top center-block">
+            <p>你有且仅有一次的充值机会</p>
+            <p>是否确认充值？</p>
+            <a className="button" onClick={this.handlePayment.bind(this)}>去支付</a>
+        </div>
+        <div className="payment-qr">
+          {this.state.qrcode ? (
+            <div>
+              <div>出现跨号支付？请长按二维码支付</div>
+              <QRCode value={this.state.qrcode} />
+            </div>
           ) : (
             <div />
           )}
-      </div>;
+        </div>
+      </div>);
     }
 }
 
@@ -387,12 +474,10 @@ class SharePage extends React.Component {
 
 class LoginPage extends React.Component {
   componentWillMount() {
-          console.log("herereherereherere ");
     var { code, state } = this.props.location.query;
     this.setState({code: code, state: state})
   }
   componentDidMount(){
-          console.log("herere");
     if (this.state.code) {
       var self = this;
       var code = this.state.code;
@@ -502,7 +587,7 @@ function routeOnChange(nextState, replace){
     success: function(resp){
       if(resp.code == "ok"){
         wx.config({
-            debug: true,
+            debug: false,
             appId: appId,
             timestamp: timestamp,
             nonceStr: nonceStr, // 必填，生成签名的随机串

@@ -1,0 +1,133 @@
+body {
+  margin: 0px;
+  font-family: "Microsoft YaHei",Helvetica,"Hiragino Sans GB",Arial,sans-serif;
+  color: #575662;
+}
+
+p {
+  margin: 0px;
+}
+
+.pager {
+  position: absolute;
+  height: 100%;
+  width: 50%;
+  margin: 0px;
+}
+
+.show{
+  display: block;
+}
+
+.guide {
+  display: none;
+  background-image: url(../public/tap.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.prev {
+  top: 0px;
+  left: 0px;
+}
+
+.next {  
+  top: 0px;
+  right: 0px;
+}
+
+.bottom {
+  bottom: 0px;
+  width: 100%;
+  height: 50%;
+}
+
+#reader {
+  padding: 40px;
+}
+
+.black-cover {
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0px;
+}
+
+.menu-cover {
+  opacity: 0;
+  display: none;
+}
+
+.blur {
+    -webkit-filter: blur(10px); /* Chrome, Opera */
+       -moz-filter: blur(10px);
+        -ms-filter: blur(10px);    
+            filter: blur(10px);    
+}
+
+.justify-center {
+    display: flex;
+    justify-content: center;
+}
+
+.justify-center * {
+    margin: 0 15px;
+}
+
+.row {
+    margin: 0px;
+}
+
+.table-content {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.alert {
+  position: fixed;
+  top: 25%;
+  left: 8%;
+  background-image: url("/bombbox.png");
+  background-size: 100% 100%;
+  width: 86%;
+  height: 33%;
+  display: none;
+}
+
+.alert-body {
+  height: 70%;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+}
+
+.alert-body > div {
+    width: 100%;
+    height: 60%;
+    margin-top: 9%;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+}
+
+.alert-body > button {
+  font-size: 18px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  height: 40%;
+}
+
+.alert-cover {
+  opacity: 0.6;
+  display: none;
+
+}
+
+.center-block {
+  margin: auto;  
+  position: absolute;  
+  top: 0; left: 0; bottom: 0; right: 0;  
+  text-align: center;
+}

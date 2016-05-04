@@ -1,0 +1,201 @@
+.menu {
+    width: 100%;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0px;
+    background-color: white;
+}
+ 
+.profile {
+  height: 33%;
+  background-color: #f6f6f5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.info {
+  margin: 6% 0 6% 5%;
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.user {
+  display: flex;
+  margin: 8% 0 20% 0;
+}
+
+.user > img {
+  width: 64px;
+  height: 64px;
+}
+
+.user > div {
+  display: flex;
+  flex-direction: column-reverse;
+  margin-left: 10px;
+  font-size: 120%;
+  height: 64px;
+
+}
+
+.dashboard {
+  display: flex;
+  width: 100%;
+}
+
+.dashboard > button{
+  height: 100%;
+  width: 100%;
+  margin-right: 10px;
+
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  font-size: 100%;
+  line-height: 180%;
+
+  border-radius: 30px;
+  border-color: #575662;
+  border-width: 1px;
+  background: #f6f6f5;
+
+}
+
+.progress {
+    position: relative;
+    margin: 8% 8% 0 0;
+    width: 35%;
+    border-radius: 50%;
+    border-width: 0;
+    background: #fed54a;
+}
+
+.circle-left, .circle-right, .left, .right{
+  content: " ";
+  height: 100%;
+  width: 100%;
+}
+
+.circle-left, .circle-right {
+  position: absolute;
+}
+
+.left, .right {
+  background: #f6f6f5;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.clip {
+  left: 2px;
+  top: 2px;
+  text-align: center;
+  border-radius: 50%;
+  position: absolute;
+  background: #f6f6f5;
+}
+
+.progress-word {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 45%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  position: absolute;
+}
+
+.progress-word > span:first-child {
+  font-size: 200%;
+  color: #fed54a;
+}
+
+.progress-word > span:last-child {
+  font-size: 150%;
+}
+
+.rank {
+  height: 56%;
+  display: flex;
+  flex-direction: column;
+  padding: 5.26%;
+  justify-content: space-between;
+}
+
+.rank > div {
+  display: flex;
+}
+
+.figure {
+  height: 100%;
+  width: 13%;
+  margin-right: 2.36%;
+} 
+
+.rank .name {
+  font-size: 14px;
+  margin-bottom: 1.18%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.rank_detail {
+  width: 71.25%;
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.rank .progress-bar {
+  height: 7px;
+  border-radius: 4px;
+  margin-bottom: 7px;
+}
+
+.rank_1, .rank_2, .rank_3, .rank_4, .rank_5 {
+  height: 18%;
+}
+
+.figure {
+  background-size: 100% 100%;
+}
+
+.rank_1 > .figure{
+  background-image: url("/progress_red.png");
+}
+.rank_1 .progress-bar {
+  background-color: #ff8f84;
+}
+
+.rank_2 > .figure{
+  background-image: url("/progress_green.png");
+}
+.rank_2 .progress-bar {
+  background-color: #56e4c9;
+}
+
+.rank_3 > .figure{
+  background-image: url("/progress_yellow.png");
+}
+.rank_3 .progress-bar {
+  background-color: #fed44a;
+}
+
+.rank_4 > .figure{
+  background-image: url("/progress_blue.png");
+}
+.rank_4 .progress-bar {
+  background-color: #6cd5f5;
+}
+
+.rank_5 > .figure{
+  background-image: url("/progress_purple.png");
+}
+.rank_5 .progress-bar {
+  background-color: #adb8f6;
+}

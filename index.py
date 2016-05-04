@@ -27,7 +27,12 @@ points_yuan = 10000
 document="document_id"
 document_path="./public/reader/"
 doc_dict = {
-    document: "chujia.epub"
+    document: {
+        "file": "chujia.epub",
+        "author": "张忌",
+        "cover": "chujia.png",
+        "name": "出家"
+    }
 }
 price_dict = {
     document: 12 * points_yuan
@@ -296,7 +301,7 @@ def index(*_):
     return app.send_static_file("index.html");
 
 def total_paragraph(doc):
-    f = epub.open("%s%s" % (document_path, doc_dict[doc]))
+    f = epub.open("%s%s" % (document_path, doc_dict[doc]["file"]))
     s = 0
     counter = HTMLParagraphCounter()
     for item in f.opf.spine.itemrefs:
@@ -307,7 +312,7 @@ def total_paragraph(doc):
 def paragraph_until_cfi(doc, cfiStr):
     cfi = CFI(cfiStr)
     counter = HTMLParagraphCounter()
-    f = epub.open("%s%s" % (document_path, doc_dict[doc]))
+    f = epub.open("%s%s" % (document_path, doc_dict[doc]["file"]))
     s = 0
     for i in range(0, cfi.spinePos):
         domStr = f.read_item(f.opf.manifest[f.opf.spine.itemrefs[i][0]]).decode("utf-8")

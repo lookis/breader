@@ -1,0 +1,30 @@
+#introduction {
+  text-align: justify;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.introduction-cover {
+  background-image: url("/introduction.png");
+  background-repeat: no-repeat;
+  background-size: 100%;
+  height: 45%;
+}
+
+#introduction > img {
+  height: 64px;
+  width: 64px;
+  margin: 0 auto 9px auto;
+}
+
+.introduction-name {
+  color: #4dcdb5;
+  margin: 0 auto 16px auto;
+  font-size: 20px;
+}
+
+.introduction-content {
+  margin: 0 auto;
+  font-size: 20px;
+}

@@ -1,0 +1,42 @@
+.payment {
+  height: 100%;
+}
+
+.payment-top {
+  height: 30%;
+  background-color: #f6f6f5;
+  position: relative;
+  padding-top: 15%;
+}
+
+.payment-qr {
+  height: 60%;
+  position: relative;
+}
+
+.payment-qr > div{
+  height: 50%;
+  overflow: auto;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  text-align: center;
+}
+
+.payment-top * {
+  text-align: center;
+}
+
+.button {
+    background-image: url("/button.png");
+    background-size: 100% 100%;
+    display: inline-block;
+    font-size: 100%;
+    line-height: 42px;
+    height: 42px;
+    width: 103px;
+    margin-top: 24px;
+}
