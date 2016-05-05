@@ -9,10 +9,11 @@ window.RSVP = require("./node_modules/rsvp/dist/rsvp.js");
 window.ePub = require("./node_modules/epubjs/build/epub.js");
 window.JSZip = require("jszip")
 import "inobounce"
+import "jquery-ui"
 import React from "react"
 import ReactDOM from "react-dom"
 import Hammer from "hammerjs"
-import QRCode from "qrcode.react"
+import QRCode from "react-qr"
 import Cookies from "js-cookie"
 import { Router, Route, IndexRoute, Link, IndexRedirect, browserHistory } from 'react-router'
 
@@ -36,6 +37,7 @@ export class App extends React.Component {
       book_name: undefined,
       progress: 0,
       total: 0,
+      paid: false,
       rank: []
     }
   }
@@ -146,7 +148,8 @@ export class App extends React.Component {
           self.setState({
             name: resp.ret.name,
             headimg: resp.ret.headimg,
-            balance: resp.ret.balance
+            balance: resp.ret.balance,
+            paid: resp.ret.paid
           })
         }else{
           alert(resp);
@@ -158,7 +161,7 @@ export class App extends React.Component {
     alert("请点击微信右上角分享");
   }
   handleTopup(e){
-    window.location.replace("/"+this.props.params.doc+"/payment");
+    window.location.replace("/payment");
   }
   handleCloseAlert(e){
     $(".alert").hide();
@@ -188,10 +191,16 @@ export class App extends React.Component {
                       <span>{this.state.name}</span>
                     </div>
                   </div>
-                  <div className="dashboard">
-                    <button onClick={this.handleTopup.bind(this)}>充值</button>
-                    <button onClick={this.handleShare.bind(this)}>分享</button>
-                  </div>
+                  {this.state.paid ? (
+                    <div className="dashboard">
+                      <button onClick={this.handleShare.bind(this)}>分享</button>
+                    </div>
+                  ) : (
+                    <div className="dashboard">
+                      <button onClick={this.handleTopup.bind(this)}>充值</button>
+                      <button onClick={this.handleShare.bind(this)}>分享</button>
+                    </div>
+                  )}
                 </div>
                 <div className="progress">
                   <div className="circle-left">
@@ -213,8 +222,8 @@ export class App extends React.Component {
                   return (
                     <div className={"rank_" + (i+1)} key={r.id}>
                       <div className="figure" ></div>
-                      <div className="rank_detail">
-                        <div className="progress-bar" style={{width: (r.progress/this.state.total * 100).toFixed(0) + "%"}}></div>
+                      <div className="rank_detail" style={{width: (r.progress/this.state.total * 100).toFixed(0) + "%"}}>
+                        <div className="progress-bar"></div>
                         <div className="name">
                           <span>{r.name}</span>
                           <span>{r.progress}</span>
@@ -326,8 +335,8 @@ class Introduction extends React.Component {
   render() {
     return (
       <div id="introduction">
-        <div className="introduction-cover"></div>
-        <img src={this.props.headimg.replace(/0$/, '64')}/>
+        <img className="introduction-cover" src="/introduction.png" />
+        <img className="introduction-head" src={this.props.headimg.replace(/0$/, '64')}/>
         <div className="introduction-name">
           {this.props.name}
         </div>
@@ -377,6 +386,12 @@ class PaymentPage extends React.Component {
     constructor(props) {
       super(props);
       this.state = { qrcode: undefined }
+    }
+    componentDidMount() {
+      $(".payment").css({
+        'height': $(window).height(),
+        'width': $(window).width()
+      })     
     }
     handlePayment(){
       var self = this;
@@ -437,7 +452,7 @@ class PaymentPage extends React.Component {
           {this.state.qrcode ? (
             <div>
               <div>出现跨号支付？请长按二维码支付</div>
-              <QRCode value={this.state.qrcode} />
+              <QRCode text={this.state.qrcode} />
             </div>
           ) : (
             <div />
@@ -458,7 +473,7 @@ class SharePage extends React.Component {
       var self = this;
       if (self.props.params.uid && self.props.params.uid != localStorage.uid){
         $.post({
-          url: "/api/share/" + self.props.params.uid,
+          url: "/api/share/" + self.props.id + "/" + self.props.params.uid,
           success: function(){
             window.location.replace("/" + self.props.id + "/dispatch");
           }
@@ -629,6 +644,7 @@ function routeOnChange(nextState, replace){
 ReactDOM.render(
   <Router history={browserHistory}>
     <Route path="/login" component={LoginPage} />
+    <Route path="/payment" component={PaymentPage} onEnter={routeOnChange}/>
     <Route path="/:doc" component={App} onEnter={requireAuth}>
       <IndexRoute component={DispatchPage}/>
       <Route path="read" component={Reader} onEnter={routeOnChange}/>
@@ -636,7 +652,6 @@ ReactDOM.render(
       <Route path="guide" component={Guide} onEnter={routeOnChange}/>
       <Route path="dispatch" component={DispatchPage} onEnter={routeOnChange}/>
       <Route path="share/:uid" component={SharePage} onEnter={routeOnChange}/>
-      <Route path="payment" component={PaymentPage} onEnter={routeOnChange}/>
     </Route>
   </Router>
   , document.querySelector("#myApp")

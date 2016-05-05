@@ -31,11 +31,10 @@ doc_dict = {
         "file": "chujia.epub",
         "author": "张忌",
         "cover": "chujia.png",
-        "name": "出家"
+        "name": "出家",
+        "price": 12 * points_yuan,
+        "share_rate": 0.3
     }
-}
-price_dict = {
-    document: 12 * points_yuan
 }
 
 appid="wx6a3e59d1061ba5b4"
@@ -64,7 +63,7 @@ def rank(doc):
         p = paragraph_until_cfi(doc, redis.get(key))
         r[re.search(r"progress\|(.+)\|%s" % doc, key).group(1)] = p
     name = dict(zip(r.keys(), redis.mget(["name|%s" % id for id in r.keys()])))
-    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:10]], "me": r[current_user.get_id()], "total": total_paragraph(doc)})
+    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()], "total": total_paragraph(doc)})
 
 
 @app.route("/api/<doc>/permission", methods=["GET"])
@@ -86,7 +85,7 @@ def payment(doc):
         bought = int(redis.get("permission|%s|%s" % (current_user.get_id(), doc)))
         to_buy = paragraph_until_cfi(doc, request.form.get("end")) - bought
         total = total_paragraph(doc)
-        price = int(price_dict[doc] * to_buy / total)
+        price = int(doc_dict[doc]["price"] * to_buy / total)
         print(price)
         balance = int(redis.get("balance|%s" % current_user.get_id()))
         if (balance < price):
@@ -102,8 +101,10 @@ def payment(doc):
                     payment[user] = int(price * shared[user])
                     rest = rest - payment[user]
             redis.decr("balance|%s" % current_user.get_id(), price)
+            console.log("payment: %s" % payment)
             for user in payment.keys():
                 redis.incr("balance|%s" % user, payment[user])
+
             redis.incr("income|%s" % doc, rest)
             redis.set("permission|%s|%s" % (current_user.get_id(), doc), paragraph_until_cfi(doc, request.form.get("end")))
             history = {
@@ -456,8 +457,6 @@ def find_node(root, uid):
 def build_tree_from_history(docId):
     root = Node(None, None)
     for record in document_filter(history(), [docId]):
-        # if record["action"] == "UPLOAD":
-        #     root = Node(record["uid"], None)
         if (record["action"] == "SHARE"):
             node = find_node(root, record["uid"])
             if node is None:
@@ -488,13 +487,13 @@ def parents(node, level = None):
 def pay(payer, docId):
     for node in walk(build_tree_from_history(docId)):
         if node.value == payer:
-            payee = parents(node, 3)
+            payee = parents(node, 1)
             shared = {}
             for idx, x in enumerate(payee):
                 if idx < len(payee)-1:
-                    shared[x.value] = share_rate ** (idx + 1) - share_rate ** (idx + 2)
+                    shared[x.value] = doc_dict[docId]["share_rate"] ** (idx + 1) - doc_dict[docId]["share_rate"] ** (idx + 2)
                 else:
-                    shared[x.value] = share_rate ** (idx + 1)
+                    shared[x.value] = doc_dict[docId]["share_rate"] ** (idx + 1)
             return shared
     return {}
 ################################

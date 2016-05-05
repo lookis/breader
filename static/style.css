@@ -8,6 +8,12 @@ p {
   margin: 0px;
 }
 
+button {
+    background-color: Transparent;
+    background-repeat:no-repeat;
+    border: none;
+}
+
 .pager {
   position: absolute;
   height: 100%;
