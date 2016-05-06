@@ -242,7 +242,7 @@ export class App extends React.Component {
                   return (
                     <div className={"rank_" + (i+1)} key={r.id}>
                       <div className="figure" ></div>
-                      <div className="rank_detail" style={{width: (r.progress/this.state.total * 100).toFixed(0) + "%"}}>
+                      <div className="rank_detail" style={{width: (r.progress/this.state.total * 86).toFixed(0) + "%"}}>
                         <div className="progress-bar"></div>
                         <div className="name">
                           <span>{r.name}</span>
@@ -276,6 +276,7 @@ class Reader extends React.Component {
                 height: $(window).height() - 80,
                 spreads: false
     });
+    window.Book = this.Book;
     var self = this;
     this.Book.renderTo("reader");
     this.Book.ready.all.then(function(){
@@ -288,6 +289,9 @@ class Reader extends React.Component {
         }
       })
     });
+    this.Book.on('book:atEnd', function(e){
+      window.location = "/" + self.props.id + "/end";
+    })
     this.Book.on('renderer:visibleRangeChanged', function(e){
       $("#reader").addClass("blur");
       $.get({
@@ -586,6 +590,30 @@ class DispatchPage extends React.Component {
     }
 }
 
+class EndPage extends React.Component {
+    constructor(props) {
+        super(props);
+        this.displayName = 'EndPage';
+    }
+    render() {
+      return (<div className="payment">
+        <div className="payment-top center-block">
+          <p>祝贺你活到了最后，哈哈！ </p>
+          <p>更多全网首发，更多文学精彩，尽在—— </p>
+          <p>“行距” </p>
+        </div>
+        <div className="payment-qr">
+            <div>
+              <img src="/hangju.png" width="150" height="150" />
+            </div>
+        </div>
+      </div>);
+    }
+}
+
+export default EndPage;
+
+
 var Auth = {
   login: function(ticket, uid, openid, callback) {
     Cookies.set("ticket", ticket);
@@ -650,16 +678,6 @@ function routeOnChange(nextState, replace){
 
 }
 
-//1. 同步至最远
-//4. 消费
-//2. 充值 !
-//3. 分享 !
-//5. Guide
-
-[App, Reader, Introduction, Guide, SharePage, LoginPage, DispatchPage].forEach(function(e){
-  e.contextTypes = { router: function(){return React.PropTypes.object.isRequired}}
-})
-
 ReactDOM.render(
   <Router history={browserHistory}>
     <Route path="/login" component={LoginPage} />
@@ -671,6 +689,7 @@ ReactDOM.render(
       <Route path="guide" component={Guide} onEnter={routeOnChange}/>
       <Route path="dispatch" component={DispatchPage} onEnter={routeOnChange}/>
       <Route path="share/:uid" component={SharePage} onEnter={routeOnChange}/>
+      <Route path="end" component={EndPage} onEnter={routeOnChange}/>
     </Route>
   </Router>
   , document.querySelector("#myApp")

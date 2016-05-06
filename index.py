@@ -16,7 +16,7 @@ from datetime import *
 from dateutil.tz import *
 
 redis_zs = redis.StrictRedis(host="10.172.252.228", password="wod0Iv9eel6nuk0hI7hY", decode_responses=True, db=0)
-redis = redis.StrictRedis(host="192.168.1.33", decode_responses=True, db=1)
+redis = redis.StrictRedis(host="10.172.252.228", password="wod0Iv9eel6nuk0hI7hY", decode_responses=True, db=1)
 
 app = Flask(__name__, static_folder='public', static_url_path='')
 app.config['DEBUG'] = True
@@ -28,12 +28,12 @@ document="document_id"
 document_path="./public/reader/"
 doc_dict = {
     document: {
-        "file": "chujia.epub",
+        "file": "dajiesha.epub",
         "author": "张忌",
-        "cover": "chujia.png",
-        "name": "出家",
+        "cover": "dajiesha.png",
+        "name": "大劫杀",
         "price": 12 * points_yuan,
-        "share_rate": 0.3
+        "share_rate": 0.2
     }
 }
 
@@ -57,13 +57,13 @@ def progress(doc):
 @app.route("/api/<doc>/rank", methods=["GET"])
 @login_required
 def rank(doc):
-    keys = redis.keys("progress|*|%s" % doc)
+    keys = redis.keys("permission|*|%s" % doc)
     r = {}
     for key in keys:
-        p = paragraph_until_cfi(doc, redis.get(key))
-        r[re.search(r"progress\|(.+)\|%s" % doc, key).group(1)] = p
+        p = int(redis.get(key))
+        r[re.search(r"permission\|(.+)\|%s" % doc, key).group(1)] = p
     name = dict(zip(r.keys(), redis.mget(["name|%s" % id for id in r.keys()])))
-    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()], "total": total_paragraph(doc)})
+    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()], "total": total_paragraph(doc) - 1})
 
 
 @app.route("/api/<doc>/permission", methods=["GET"])
@@ -86,7 +86,6 @@ def payment(doc):
         to_buy = paragraph_until_cfi(doc, request.form.get("end")) - bought
         total = total_paragraph(doc)
         price = int(doc_dict[doc]["price"] * to_buy / total)
-        print(price)
         balance = int(redis.get("balance|%s" % current_user.get_id()))
         if (balance < price):
             return resp("fail")
@@ -168,7 +167,6 @@ def get_jsapi_ticket():
     else:
         response = urllib.request.urlopen("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi" % get_wechat_accesstoken())
         obj = json.loads(response.readall().decode('utf-8'))
-        print(json.dumps(obj))
         redis_zs.setex(cache_key, 7200, json.dumps(obj))
         return obj["ticket"]
 
