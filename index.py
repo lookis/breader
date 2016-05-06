@@ -101,7 +101,6 @@ def payment(doc):
                     payment[user] = int(price * shared[user])
                     rest = rest - payment[user]
             redis.decr("balance|%s" % current_user.get_id(), price)
-            console.log("payment: %s" % payment)
             for user in payment.keys():
                 redis.incr("balance|%s" % user, payment[user])
 
@@ -122,18 +121,16 @@ def payment(doc):
 
 @app.route("/api/share/<doc>/<uid>", methods = ["POST"])
 @login_required
-def accept_share(uid):
-    info = json.loads(redis.get("document|%s" % document))
-    if current_user.get_id() is not uid:
-        history = {
-            "id": str(ObjectId()),
-            "uid": uid,
-            "action": "SHARE",
-            "document": document,
-            "time": datetime.now(tzutc()).strftime("%Y/%m/%d %H:%M:%S %Z%z"),
-            "target": current_user.get_id()
-        }
-        make_history(history)
+def accept_share(doc, uid):
+    history = {
+        "id": str(ObjectId()),
+        "uid": uid,
+        "action": "SHARE",
+        "document": doc,
+        "time": datetime.now(tzutc()).strftime("%Y/%m/%d %H:%M:%S %Z%z"),
+        "target": current_user.get_id()
+    }
+    make_history(history)
     return resp("ok")
 
 @app.route("/api/user", methods=["GET"])
@@ -207,7 +204,7 @@ def qr_payment():
         "nonce_str": ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20)),
         "body": "reader",
         "out_trade_no": "%s_%s" % (current_user.get_id(), ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(7))),
-        "total_fee": 100,
+        "total_fee": 1,
         "spbill_create_ip": my_ip(),
         "notify_url": request.scheme + "://" + request.host + "/api/wechat/payment/notify",
         "trade_type": "NATIVE",
@@ -230,7 +227,7 @@ def wechat_payment():
         "nonce_str": ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20)),
         "body": "reader",
         "out_trade_no": "%s_%s" % (current_user.get_id(), ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(7))),
-        "total_fee": 100,
+        "total_fee": 1,
         "spbill_create_ip": request.remote_addr,
         "notify_url": request.scheme + "://" + request.host + "/api/wechat/payment/notify",
         "trade_type": "JSAPI",
@@ -253,13 +250,13 @@ def wechat_payment():
     sign = wechat_sign(payment_sign)
     return resp("ok", {"package": "prepay_id=%s" % prepay_id, "paySign": sign})
 
-@app.route("/api/wechat/payment/notify", methods=["GET"])
+@app.route("/api/wechat/payment/notify", methods=["GET", "POST"])
 def wechat_payment_callback():
-    r = request.data
+    r = request.data.decode("utf-8")
     match = re.search(r"<out_trade_no><!\[CDATA\[(.+)]]></out_trade_no>", r)
     user_id = match.group(1)[:24]
+    redis.incr("balance|%s" % user_id, 1 * points_yuan)
     if not redis.exists("paid|%s" % user_id):
-        redis.incr("balance|%s" % user_id, 1 * points_yuan)
         redis.set("paid|%s" % user_id, True)
     content = '''
     <xml>
@@ -501,7 +498,7 @@ def pay(payer, docId):
 @login_manager.request_loader
 def load_user_from_request(request):
     ticket = request.cookies.get("ticket")
-    if ticket:
+    if ticket and redis.exists("ticket2id|%s" % ticket):
         return User(redis.get("ticket2id|%s" % ticket))
     return None
 

@@ -21,7 +21,6 @@ const appId = "wx6a3e59d1061ba5b4"
 const shareTitle = "ShareTitle"
 const shareDescription = "ShareDescription"
 const shareImg = "http://LiNk"
-const introduction = "我参加了这个接力阅读的游戏！看谁读的远。"
 
 export class App extends React.Component {
   constructor(props) {
@@ -115,6 +114,21 @@ export class App extends React.Component {
       'height': $(window).height(),
       'width': $(window).width()
     })
+
+    wx.ready(function(){
+      wx.onMenuShareTimeline({
+        title: shareTitle,
+        link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
+        imgUrl: shareImg
+      });
+      wx.onMenuShareAppMessage({
+        title: shareTitle,
+        desc: shareDescription,
+        link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
+        imgUrl: shareImg
+      })
+    })
+
   }
   reloadUserRank(){
     var self = this;
@@ -154,6 +168,12 @@ export class App extends React.Component {
         }else{
           alert(resp);
         }
+      },
+      error: function(httpObj, textStatus){
+        if (httpObj.status == 401){
+          Auth.logout();
+          window.location.reload(true);
+        }
       }
     })
   }
@@ -161,7 +181,7 @@ export class App extends React.Component {
     alert("请点击微信右上角分享");
   }
   handleTopup(e){
-    window.location.replace("/payment");
+    window.location = "/payment";
   }
   handleCloseAlert(e){
     $(".alert").hide();
@@ -290,7 +310,11 @@ class Reader extends React.Component {
                   self.props.reloadUserInfo();
                   self.props.reloadUserRank();
                 }else{
-                  alert("点数不够啦，请充值或分享吧！");
+                  if (self.props.paid) {
+                    alert("想读更多？快快分享好友。")
+                  }else{
+                    alert("点数不够啦，请充值或分享吧！");
+                  }
                   self.Book.prevPage();
                 }
               }
@@ -330,20 +354,23 @@ class Introduction extends React.Component {
     super(props);
   }
   handleStart() {
-    window.location.replace("/"+this.props.id+"/guide");
+    window.location = "/"+this.props.id+"/guide";
   }
   render() {
     return (
       <div id="introduction">
         <img className="introduction-cover" src="/introduction.png" />
-        <img className="introduction-head" src={this.props.headimg.replace(/0$/, '64')}/>
-        <div className="introduction-name">
-          {this.props.name}
-        </div>
         <div className="introduction-content">
-          {introduction}
+          <p>咦，你也来玩“一元读”游戏啦！</p>
+          <p>全网首发《太平洋大逃杀》惟一完整版</p>
+          <p>游戏规则：</p>
+          <p>Ａ.0元开始，1元赞赏。</p>
+          <p>Ｂ.分享越多好友，越快读到大结局。</p>
+          <p>Ｃ.第一个读完的同学奖励1000元人民币。</p>
         </div>
-        <button onClick={this.handleStart.bind(this)}>开始阅读</button>
+        <div className="center-block">
+          <button className="button center-block" onClick={this.handleStart.bind(this)}>读起！</button>
+        </div>
       </div>
     )
   }
@@ -352,23 +379,18 @@ class Introduction extends React.Component {
 
 class Guide extends React.Component {
     constructor(props) {
-        super(props);
+      super(props);
     }
     componentDidMount() {
-           
-    }
-    handleNext(e){
-      var e = $(".guide.show");
-      var next = e.next();
-      e.removeClass("show");
-      if(next.length != 0){
-        next.addClass("show");
-      }else{
-        window.location.replace("/"+this.props.id+"/read");
-      }
+      $(".guide").hide();
     }
     handleStart(e){
-      window.location.replace("/"+this.props.id+"/read");
+      var guide = $(".guide");
+      if (guide.is(":visible")){
+        window.location = "/"+this.props.id+"/read";
+      }else{
+        guide.show();
+      }
     }
     render() {
         return (<div className="cover-page" onClick={this.handleStart.bind(this)}>
@@ -378,6 +400,13 @@ class Guide extends React.Component {
                 <div className="book-author" >{this.props.author}</div>
             </div>
             <div className="cover-footer"></div>
+            <div className="guide">
+              <div className="center-block">
+                <div><img src="/tap.png" />向前翻页</div>
+                <div>向后翻页<img src="/tap.png" /></div>
+              </div>
+              <div className="guide-menu"><img src="/hand_up.png" />菜单</div>
+            </div>
           </div>);
     }
 }
@@ -415,10 +444,8 @@ class PaymentPage extends React.Component {
               paySign: resp.ret.paySign,
               success: function(res){
                 if(res.errMsg == "chooseWXPay:ok"){
-
+                  window.history.back();
                 }else if(res.errMsg == "chooseWXPay:cancel"){
-                  
-                }else{
                   
                 }
               },
@@ -441,12 +468,18 @@ class PaymentPage extends React.Component {
         }
       })
     }
+    handleGoBack(e){
+      window.history.back();
+    }
     render() {
       return (<div className="payment">
         <div className="payment-top center-block">
-            <p>你有且仅有一次的充值机会</p>
-            <p>是否确认充值？</p>
-            <a className="button" onClick={this.handlePayment.bind(this)}>去支付</a>
+            <p>赞赏一下作者吧！</p>
+            <p>公告：本游戏不接受超过1元的充值哦。</p>
+            <div>
+              <a className="button" onClick={this.handleGoBack.bind(this)}>1块也没有:(</a>
+              <a className="button" onClick={this.handlePayment.bind(this)}>正好有1块:)</a>
+            </div>
         </div>
         <div className="payment-qr">
           {this.state.qrcode ? (
@@ -475,11 +508,11 @@ class SharePage extends React.Component {
         $.post({
           url: "/api/share/" + self.props.id + "/" + self.props.params.uid,
           success: function(){
-            window.location.replace("/" + self.props.id + "/dispatch");
+            window.location = "/" + self.props.id + "/dispatch";
           }
         })
       }else{
-        window.location.replace("/" + this.props.id + "/dispatch");
+        window.location = "/" + this.props.id + "/dispatch";
       }
     }
     render() {
@@ -503,10 +536,10 @@ class LoginPage extends React.Component {
           if(resp.code == "ok"){
             Auth.login(resp.ret.ticket, resp.ret.uid, resp.ret.openid)
             if (self.state.state && self.state.state != "undefined"){
-              window.location.replace(sessionStorage[self.state.state])
+              window.location = sessionStorage[self.state.state]
               delete sessionStorage[self.state.state]
             }else{
-              window.location.replace('/')
+              window.location = '/'
             }
           }else{
             alert(resp)
@@ -521,7 +554,7 @@ class LoginPage extends React.Component {
         sessionStorage[state] = location.state.nextPathname;
       }
       var url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+appId+"&redirect_uri="+encodeURIComponent("http://www.zan-shang.com/bc/login")+"&response_type=code&scope=snsapi_userinfo&state="+state+"#wechat_redirect"
-      window.location.replace(url)
+      window.location = url
     }
   }
   render() {
@@ -541,9 +574,9 @@ class DispatchPage extends React.Component {
         url: "/api/" + self.props.id + "/progress",
         success: function(r){
           if (r.code == "ok" && r.ret && r.ret.progress){
-            window.location.replace("/" + self.props.id + "/read");
+            window.location = "/" + self.props.id + "/read";
           }else{
-            window.location.replace("/" + self.props.id + "/introduction");
+            window.location = "/" + self.props.id + "/introduction";
           }
         }
       })  
@@ -609,20 +642,6 @@ function routeOnChange(nextState, replace){
             signature: resp.ret,// 必填，签名，见附录1
             jsApiList: ["onMenuShareTimeline", "onMenuShareAppMessage", "chooseWXPay"]
         });
-        wx.ready(function(){
-          wx.onMenuShareTimeline({
-            title: shareTitle,
-            link: window.location.origin + "/share/" + localStorage.uid,
-            imgUrl: shareImg
-          });
-          wx.onMenuShareAppMessage({
-            title: shareTitle,
-            desc: shareDescription,
-            link: window.location.origin + "/share/" + localStorage.uid,
-            imgUrl: shareImg
-          })
-        })
-
       }else{
         alert(resp);
       }

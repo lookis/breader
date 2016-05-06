@@ -17,7 +17,7 @@
 .payment-qr > div{
   height: 50%;
   overflow: auto;
-  margin: auto;
+  margin-top: 10%;
   position: absolute;
   top: 0;
   left: 0;
@@ -39,4 +39,5 @@
     height: 42px;
     width: 103px;
     margin-top: 24px;
+    margin-right: 10px;
 }
