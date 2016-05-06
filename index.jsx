@@ -386,14 +386,13 @@ class Guide extends React.Component {
       super(props);
     }
     componentDidMount() {
-      $(".guide").hide();
     }
     handleStart(e){
       var guide = $(".guide");
       if (guide.is(":visible")){
-        window.location = "/"+this.props.id+"/read";
+        guide.hide();
       }else{
-        guide.show();
+        window.location = "/"+this.props.id+"/read";
       }
     }
     render() {
