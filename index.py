@@ -24,13 +24,13 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 points_yuan = 10000
 
-document="document_id"
+document="572fc935d159466168cf0431"
 document_path="./public/reader/"
 doc_dict = {
     document: {
         "file": "dajiesha.epub",
-        "author": "张忌",
-        "cover": "dajiesha.png",
+        "author": "郭国松",
+        "cover": "dajiesha.jpg",
         "name": "大劫杀",
         "price": 12 * points_yuan,
         "share_rate": 0.2
