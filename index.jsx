@@ -18,9 +18,10 @@ import Cookies from "js-cookie"
 import { Router, Route, IndexRoute, Link, IndexRedirect, browserHistory } from 'react-router'
 
 const appId = "wx6a3e59d1061ba5b4"
-const shareTitle = "ShareTitle"
-const shareDescription = "ShareDescription"
-const shareImg = "http://LiNk"
+const shareTitleSingle = "太平洋大劫杀。你开始读，我就能活下去"
+const shareTitle = "太平洋大劫杀"
+const shareDescription = "郭国松"
+const shareImg = "http://7xizu1.com1.z0.glb.clouddn.com/@/image/572fc733e4b06db6a571729b.jpg"
 
 export class App extends React.Component {
   constructor(props) {
@@ -117,7 +118,7 @@ export class App extends React.Component {
 
     wx.ready(function(){
       wx.onMenuShareTimeline({
-        title: shareTitle,
+        title: shareTitleSingle,
         link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
         imgUrl: shareImg
       });
@@ -366,11 +367,11 @@ class Introduction extends React.Component {
         <img className="introduction-cover" src="/introduction.png" />
         <div className="introduction-content">
           <p>咦，你也来玩“一元读”游戏啦！</p>
-          <p>全网首发《太平洋大逃杀》惟一完整版</p>
+          <p>全网首发《太平洋大劫杀》惟一完整版</p>
           <p>游戏规则：</p>
-          <p>Ａ.0元开始，1元赞赏。</p>
-          <p>Ｂ.分享越多好友，越快读到大结局。</p>
-          <p>Ｃ.第一个读完的同学奖励1000元人民币。</p>
+          <p>Ａ.0元开始读，1元赏作者。</p>
+          <p>Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。你分享越多，越快读到大结局。</p>
+          <p>Ｃ.最快读完的前500名同学每人奖励10元。</p>
         </div>
         <div className="center-block">
           <button className="button center-block" onClick={this.handleStart.bind(this)}>读起！</button>
@@ -597,21 +598,16 @@ class EndPage extends React.Component {
     render() {
       return (<div className="payment">
         <div className="payment-top center-block">
-          <p>祝贺你活到了最后，哈哈！ </p>
-          <p>更多全网首发，更多文学精彩，尽在—— </p>
-          <p>“行距” </p>
+          <p>关注  “比特阅读”公号，为您同步阅读进度。点开作品链接，随时随地，想读就读。</p>
         </div>
         <div className="payment-qr">
             <div>
-              <img src="/hangju.png" width="150" height="150" />
+              <img src="/qrcode.jpg" width="150" height="150" />
             </div>
         </div>
       </div>);
     }
 }
-
-export default EndPage;
-
 
 var Auth = {
   login: function(ticket, uid, openid, callback) {
