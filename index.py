@@ -276,7 +276,7 @@ def base_login(code, appid, secret):
     if not redis.exists("unionid2id|%s" % unionid):
         uid = str(ObjectId())
         redis.set("unionid2id|%s" % unionid, uid)
-        redis.set("balance|%s" % uid, int(2.0066 * points_yuan))
+        redis.set("balance|%s" % uid, int(0.4209 * points_yuan))
     uid = redis.get("unionid2id|%s" % unionid)
     #Update info
     query = urllib.parse.urlencode({"access_token": access_token, "openid": openid})
