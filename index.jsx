@@ -243,8 +243,8 @@ export class App extends React.Component {
                   return (
                     <div className={"rank_" + (i+1)} key={r.id}>
                       <div className="figure" ></div>
-                      <div className="rank_detail" style={{width: (r.progress/this.state.total * 86).toFixed(0) + "%"}}>
-                        <div className="progress-bar"></div>
+                      <div className="rank_detail">
+                        <div className="progress-bar" style={{width: (r.progress/this.state.total * 86).toFixed(0) + "%"}}></div>
                         <div className="name">
                           <span>{r.name}</span>
                           <span>{r.progress}</span>
@@ -281,6 +281,7 @@ class Reader extends React.Component {
     var self = this;
     this.Book.renderTo("reader");
     this.Book.ready.all.then(function(){
+      $("#loading").hide();
       $.get({
         url: "/api/" + self.props.id + "/progress",
         success: function(r){
@@ -347,7 +348,7 @@ class Reader extends React.Component {
         <div className="glass" > </div>
         <div className="pager prev" onClick={this.handlePrevPage.bind(this)}> </div>
         <div id="wrapper">
-          <div id="reader"></div>
+          <div id="reader"><span id="loading">正在加载……</span></div>
         </div>
         <div className="pager next" onClick={this.handleNextPage.bind(this)}> </div>
       </div>
@@ -367,7 +368,7 @@ class Introduction extends React.Component {
         <img className="introduction-cover" src="/introduction.png" />
         <div className="introduction-content">
           <p>咦，你也来玩“一元读”游戏啦！</p>
-          <p>全网首发《太平洋大劫杀》惟一完整版</p>
+          <p>全网首发《太平洋大劫杀》唯一完整版</p>
           <p>游戏规则：</p>
           <p>Ａ.0元开始读，1元赏作者。</p>
           <p>Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。你分享越多，越快读到大结局。</p>
