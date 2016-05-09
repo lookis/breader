@@ -409,7 +409,7 @@ class Guide extends React.Component {
                 <div><img src="/tap.png" />向前翻页</div>
                 <div>向后翻页<img src="/tap.png" /></div>
               </div>
-              <div className="guide-menu"><img src="/hand_up.png" />菜单</div>
+              <div className="guide-menu"><img src="/hand_up.png" />查看进度或充值</div>
             </div>
           </div>);
     }
