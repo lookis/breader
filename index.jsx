@@ -233,7 +233,6 @@ export class App extends React.Component {
                   <div className="clip">
                     <div className="progress-word">
                       <span>{(this.state.progress/this.state.total * 100).toFixed(0)}%</span>
-                      <span>{this.state.progress}/{this.state.total}</span>
                     </div>
                   </div>
                 </div>
@@ -600,6 +599,10 @@ class EndPage extends React.Component {
       return (<div className="payment">
         <div className="payment-top center-block">
           <p>关注  “比特阅读”公号，为您同步阅读进度。点开作品链接，随时随地，想读就读。</p>
+          <p>即将上线作品：</p>
+          <p>东野圭吾《白夜行》</p>
+          <p>东野圭吾《嫌疑人x》</p>
+          <p>马克·哈登《老爸终于精神失常了！》</p>
         </div>
         <div className="payment-qr">
             <div>
