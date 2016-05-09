@@ -83,41 +83,43 @@ button {
   position: fixed;
   top: 25%;
   left: 8%;
-  background-image: url("/bombbox.png");
-  background-size: 100% 100%;
   width: 86%;
-  height: 33%;
+  height: auto;
   display: none;
+}
+
+.alert-body:before {
+    content: " ";
+    display: block;
+    background-image: url("/bombbox_up.png");
+    background-size: 100% 100%;
+    height: 93px;
 }
 
 .alert-body {
   height: 70%;
   width: 100%;
-  position: absolute;
-  bottom: 0;
+  text-align: center;
+  color: white;
+  font-size: 16px;
+}
+
+.alert > button {
+  background-image: url("/bombbox_down.png");
+  background-size: 100% 100%;
+  font-size: 18px;
+  width: 100%;
+  height: 93px;
+  padding-top: 40px;
 }
 
 .alert-body > div {
-    width: 100%;
-    height: 60%;
-    margin-top: 9%;
-    text-align: center;
-    color: white;
-    font-size: 16px;
-}
-
-.alert-body > button {
-  font-size: 18px;
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  height: 40%;
+  background-color: #56e4c9;
 }
 
 .alert-cover {
   opacity: 0.6;
   display: none;
-
 }
 
 .center-block {

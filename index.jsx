@@ -257,8 +257,8 @@ export class App extends React.Component {
             <div className="alert">
               <div className="alert-body">
                 <div>Hello World.</div>
-                <button onClick={this.handleCloseAlert.bind(this)}>知道了</button>
               </div>
+              <button onClick={this.handleCloseAlert.bind(this)}>知道了</button>
             </div>
           </div>
       );
@@ -316,9 +316,9 @@ class Reader extends React.Component {
                   self.props.reloadUserRank();
                 }else{
                   if (self.props.paid) {
-                    alert("想读更多？快快分享好友。")
+                    alert("想读更多？点击右上角，分享朋友圈，分享好友。")
                   }else{
-                    alert("点数不够啦，请充值或分享吧！");
+                    alert("想读更多？手指向上滑屏，充值打赏作者！");
                   }
                   self.Book.prevPage();
                 }
