@@ -200,9 +200,9 @@ def qr_payment():
         "appid": appid,
         "mch_id": "1231536202", 
         "nonce_str": ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20)),
-        "body": "reader",
+        "body": "阅读充值",
         "out_trade_no": "%s_%s" % (current_user.get_id(), ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(7))),
-        "total_fee": 1,
+        "total_fee": 100,
         "spbill_create_ip": my_ip(),
         "notify_url": request.scheme + "://" + request.host + "/api/wechat/payment/notify",
         "trade_type": "NATIVE",
@@ -223,9 +223,9 @@ def wechat_payment():
         "appid": appid,
         "mch_id": "1231536202", 
         "nonce_str": ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(20)),
-        "body": "reader",
+        "body": "阅读充值",
         "out_trade_no": "%s_%s" % (current_user.get_id(), ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(7))),
-        "total_fee": 1,
+        "total_fee": 100,
         "spbill_create_ip": request.remote_addr,
         "notify_url": request.scheme + "://" + request.host + "/api/wechat/payment/notify",
         "trade_type": "JSAPI",
@@ -276,7 +276,7 @@ def base_login(code, appid, secret):
     if not redis.exists("unionid2id|%s" % unionid):
         uid = str(ObjectId())
         redis.set("unionid2id|%s" % unionid, uid)
-        redis.set("balance|%s" % uid, 1 * points_yuan)
+        redis.set("balance|%s" % uid, int(2.0066 * points_yuan))
     uid = redis.get("unionid2id|%s" % unionid)
     #Update info
     query = urllib.parse.urlencode({"access_token": access_token, "openid": openid})
