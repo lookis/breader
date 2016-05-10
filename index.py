@@ -19,7 +19,7 @@ redis_zs = redis.StrictRedis(host="10.172.252.228", password="wod0Iv9eel6nuk0hI7
 redis = redis.StrictRedis(host="10.172.252.228", password="wod0Iv9eel6nuk0hI7hY", decode_responses=True, db=1)
 
 app = Flask(__name__, static_folder='public', static_url_path='')
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 login_manager = LoginManager()
 login_manager.init_app(app)
 points_yuan = 10000
@@ -63,7 +63,7 @@ def rank(doc):
         p = int(redis.get(key))
         r[re.search(r"permission\|(.+)\|%s" % doc, key).group(1)] = p
     name = dict(zip(r.keys(), redis.mget(["name|%s" % id for id in r.keys()])))
-    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()], "total": total_paragraph(doc) - 1})
+    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()] if current_user.get_id() in r else 0, "total": total_paragraph(doc) - 1})
 
 
 @app.route("/api/<doc>/permission", methods=["GET"])

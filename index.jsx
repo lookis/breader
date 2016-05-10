@@ -20,7 +20,7 @@ import { Router, Route, IndexRoute, Link, IndexRedirect, browserHistory } from '
 const appId = "wx6a3e59d1061ba5b4"
 const shareTitleSingle = "太平洋大劫杀。你开始读，我就能活下去"
 const shareTitle = "太平洋大劫杀"
-const shareDescription = "郭国松"
+const shareDescription = "中国著名法律记者郭国松根据“鲁荣渔2682”号杀人事件创作的非虚构作品"
 const shareImg = "http://7xizu1.com1.z0.glb.clouddn.com/@/image/572fc733e4b06db6a571729b.jpg"
 
 export class App extends React.Component {
@@ -82,7 +82,7 @@ export class App extends React.Component {
       success: function(resp){
         if (resp.code == "ok"){
           self.setState({
-            doc: "reader/" + resp.ret.file,
+            doc: "http://7xqzo9.com2.z0.glb.qiniucdn.com/epub/" + resp.ret.file,
             author: resp.ret.author,
             cover: "/" + resp.ret.cover,
             book_name: resp.ret.name
@@ -246,7 +246,7 @@ export class App extends React.Component {
                         <div className="progress-bar" style={{width: (r.progress/this.state.total * 86).toFixed(0) + "%"}}></div>
                         <div className="name">
                           <span>{r.name}</span>
-                          <span>{r.progress}</span>
+                          <span>{(r.progress/this.state.total * 100).toFixed(0)}%</span>
                         </div>
                       </div>
                     </div>
@@ -271,7 +271,7 @@ class Reader extends React.Component {
   }
   componentDidMount() {
     var self = this;
-    this.Book = ePub("/" + this.props.doc, {
+    this.Book = ePub(this.props.doc, {
                 width: $(window).width() - 80,
                 height: $(window).height() - 80,
                 spreads: false

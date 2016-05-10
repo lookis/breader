@@ -115,6 +115,7 @@ button {
 
 .alert-body > div {
   background-color: #56e4c9;
+  padding: 0 15px;
 }
 
 .alert-cover {
