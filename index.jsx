@@ -400,8 +400,10 @@ class Guide extends React.Component {
         return (<div className="cover-page" onClick={this.handleStart.bind(this)}>
             <div className="cover-body center-block">
                 <img className="cover" src={this.props.cover} />
-                <div className="book-name" >{this.props.book_name}</div>
-                <div className="book-author" >{this.props.author}</div>
+                <div className="book-name" >根据"鲁荣渔2682"号杀人事件</div>
+                <div className="book-name" >创作的非虚构作品</div>
+                <div className="book-author" >一幕让灵魂颤抖的人性罪恶</div>
+                <div className="book-author" >一曲社会底层人命运的悲歌</div>
             </div>
             <div className="cover-footer"></div>
             <div className="guide">

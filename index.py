@@ -3,6 +3,7 @@ from flask.ext.login import LoginManager, UserMixin, login_required, current_use
 from bson.objectid import ObjectId
 from collections import OrderedDict
 from html.parser import HTMLParser
+import threading
 import epub
 import string
 import random
@@ -36,7 +37,6 @@ doc_dict = {
         "share_rate": 0.2
     }
 }
-
 appid="wx6a3e59d1061ba5b4"
 secret="7993e77351265f8fe47ac9069a63ac38"
 key="ZanShang20150605ZanShang20151218"
@@ -90,20 +90,7 @@ def payment(doc):
         if (balance < price):
             return resp("fail")
         else:
-            
-            #send share
-            shared = pay(current_user.get_id(), doc)
-            payment = {}
-            rest = price
-            if len(shared) > 0:
-                for user in shared.keys():
-                    payment[user] = int(price * shared[user])
-                    rest = rest - payment[user]
             redis.decr("balance|%s" % current_user.get_id(), price)
-            for user in payment.keys():
-                redis.incr("balance|%s" % user, payment[user])
-
-            redis.incr("income|%s" % doc, rest)
             redis.set("permission|%s|%s" % (current_user.get_id(), doc), paragraph_until_cfi(doc, request.form.get("end")))
             history = {
                 "id": str(ObjectId()),
@@ -116,6 +103,24 @@ def payment(doc):
             make_history(history)
             #record furtherest
             redis.set("progress|%s|%s" % (current_user.get_id(), doc), request.form.get("start"))
+            user_id = current_user.get_id()
+            def send_share():
+                _user_id = user_id
+                _doc = doc
+                _price = price
+                shared = pay(_user_id, _doc)
+                payment = {}
+                rest = _price
+                if len(shared) > 0:
+                    for user in shared.keys():
+                        payment[user] = int(_price * shared[user])
+                        rest = rest - payment[user]
+                for user in payment.keys():
+                    redis.incr("balance|%s" % user, payment[user])
+                redis.incr("income|%s" % doc, rest)
+            t = threading.Thread(target=send_share)
+            t.daemon = False
+            t.start()
             return resp("ok")
 
 @app.route("/api/share/<doc>/<uid>", methods = ["POST"])
@@ -435,13 +440,18 @@ class Node():
 
 def history():
     length = redis.llen("history")
-    for i in range(length):
-        yield json.loads(redis.lindex("history", i))
+    history = redis.lrange("history", 0, length)
+    ret = []
+    for his in history:
+        ret.append(json.loads(his))
+    return ret
 
 def document_filter(history, documents):
+    ret = []
     for record in history:
         if record["document"] in documents:
-            yield record
+            ret.append(record)
+    return ret
 
 def find_node(root, uid):
     for node in walk(root):
