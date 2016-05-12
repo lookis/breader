@@ -72,13 +72,10 @@ def progress(doc):
 @app.route("/api/<doc>/rank", methods=["GET"])
 @login_required
 def rank(doc):
-    keys = redis.keys("permission|*|%s" % doc)
-    r = {}
-    for key in keys:
-        p = int(redis.get(key))
-        r[re.search(r"permission\|(.+)\|%s" % doc, key).group(1)] = p
+    rank = redis.zrevrange("rank|%s" % doc, 0, 4, withscores=True)
+    r = dict(rank)
     name = dict(zip(r.keys(), redis.mget(["name|%s" % id for id in r.keys()])))
-    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()] if current_user.get_id() in r else 0, "total": total_paragraph(doc) - 1})
+    return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])], "me": redis.zscore("rank|%s" % doc, current_user.get_id()) if redis.zscore("rank|%s" % doc, current_user.get_id()) else 0, "total": total_paragraph(doc) - 1})
 
 @app.route("/api/<doc>/permission", methods=["GET"])
 @login_required
@@ -97,7 +94,7 @@ def payment(doc):
     else:
         if not redis.exists("permission|%s|%s" % (current_user.get_id(), doc)):
             redis.set("permission|%s|%s" % (current_user.get_id(), doc), 0)
-            redis.zadd("rank|%s" % doc, current_user.get_id(), 0)
+            redis.zadd("rank|%s" % doc, 0, current_user.get_id())
         bought = int(redis.get("permission|%s|%s" % (current_user.get_id(), doc)))
         to_buy = paragraph_end - bought
         total = total_paragraph(doc)
@@ -108,7 +105,7 @@ def payment(doc):
         else:
             redis.decr("balance|%s" % current_user.get_id(), price)
             redis.set("permission|%s|%s" % (current_user.get_id(), doc), paragraph_end)
-            redis.zadd("rank|%s" % doc, current_user.get_id(), paragraph_end)
+            redis.zadd("rank|%s" % doc, paragraph_end, current_user.get_id())
             history = {
                 "id": str(ObjectId()),
                 "uid": current_user.get_id(),
