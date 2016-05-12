@@ -4,6 +4,11 @@ body {
   color: #575662;
 }
 
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
 p {
   margin: 0px;
 }

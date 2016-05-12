@@ -25,16 +25,31 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 points_yuan = 10000
 
-document="572fc935d159466168cf0431"
 document_path="./public/reader/"
 doc_dict = {
-    document: {
+    "572fc935d159466168cf0431": {
         "file": "dajiesha.epub",
         "author": "郭国松",
         "cover": "dajiesha.jpg",
-        "name": "大劫杀",
+        "name": "太平洋大劫杀",
         "price": 12 * points_yuan,
-        "share_rate": 0.2
+        "share_rate": 0.2,
+        "share": {
+            "moment": "太平洋大劫杀。你开始读，我就能活下去",
+            "title": "太平洋大劫杀",
+            "body": "中国著名法律记者郭国松根据“鲁荣渔2682”号杀人事件创作的非虚构作品",
+            "img": "http://7xizu1.com1.z0.glb.clouddn.com/@/image/572fc733e4b06db6a571729b.jpg"
+        },
+        "introduction": """咦，你也来玩“一元读”游戏啦！
+全网首发《太平洋大劫杀》唯一完整版
+游戏规则：
+Ａ.0元开始读，1元赏作者。
+Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。你分享越多，越快读到大结局。
+Ｃ.最快读完的前500名同学每人奖励10元。""",
+        "guide": """根据"鲁荣渔2682"号杀人事件
+创作的非虚构作品
+一幕让灵魂颤抖的人性罪恶
+一曲社会底层人命运的悲歌"""
     }
 }
 appid="wx6a3e59d1061ba5b4"
@@ -65,7 +80,6 @@ def rank(doc):
     name = dict(zip(r.keys(), redis.mget(["name|%s" % id for id in r.keys()])))
     return resp("ok", {"rank": [{"name": name[key], "progress": value, "id": key} for key, value in sorted(r.items(), key=lambda x: -x[1])[:5]], "me": r[current_user.get_id()] if current_user.get_id() in r else 0, "total": total_paragraph(doc) - 1})
 
-
 @app.route("/api/<doc>/permission", methods=["GET"])
 @login_required
 def permission(doc):
@@ -77,13 +91,15 @@ def permission(doc):
 @app.route("/api/<doc>/payment", methods=["POST"])
 @login_required
 def payment(doc):
-    if redis.exists("permission|%s|%s" % (current_user.get_id(), doc)) and int(redis.get("permission|%s|%s" % (current_user.get_id(), doc))) >= paragraph_until_cfi(doc, request.form.get("end")):
+    paragraph_end = paragraph_until_cfi(doc, request.form.get("end"))
+    if redis.exists("permission|%s|%s" % (current_user.get_id(), doc)) and (int(redis.get("permission|%s|%s" % (current_user.get_id(), doc))) >= paragraph_end):
         return resp("ok")
     else:
         if not redis.exists("permission|%s|%s" % (current_user.get_id(), doc)):
             redis.set("permission|%s|%s" % (current_user.get_id(), doc), 0)
+            redis.zadd("rank|%s" % doc, current_user.get_id(), 0)
         bought = int(redis.get("permission|%s|%s" % (current_user.get_id(), doc)))
-        to_buy = paragraph_until_cfi(doc, request.form.get("end")) - bought
+        to_buy = paragraph_end - bought
         total = total_paragraph(doc)
         price = int(doc_dict[doc]["price"] * to_buy / total)
         balance = int(redis.get("balance|%s" % current_user.get_id()))
@@ -91,7 +107,8 @@ def payment(doc):
             return resp("fail")
         else:
             redis.decr("balance|%s" % current_user.get_id(), price)
-            redis.set("permission|%s|%s" % (current_user.get_id(), doc), paragraph_until_cfi(doc, request.form.get("end")))
+            redis.set("permission|%s|%s" % (current_user.get_id(), doc), paragraph_end)
+            redis.zadd("rank|%s" % doc, current_user.get_id(), paragraph_end)
             history = {
                 "id": str(ObjectId()),
                 "uid": current_user.get_id(),

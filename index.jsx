@@ -18,10 +18,6 @@ import Cookies from "js-cookie"
 import { Router, Route, IndexRoute, Link, IndexRedirect, browserHistory } from 'react-router'
 
 const appId = "wx6a3e59d1061ba5b4"
-const shareTitleSingle = "太平洋大劫杀。你开始读，我就能活下去"
-const shareTitle = "太平洋大劫杀"
-const shareDescription = "中国著名法律记者郭国松根据“鲁荣渔2682”号杀人事件创作的非虚构作品"
-const shareImg = "http://7xizu1.com1.z0.glb.clouddn.com/@/image/572fc733e4b06db6a571729b.jpg"
 
 export class App extends React.Component {
   constructor(props) {
@@ -30,15 +26,17 @@ export class App extends React.Component {
       name: "Unknown",
       headimg: "about:blank",
       balance: 0,
+      progress: 0,
+      paid: false,
       id: this.props.params.doc,
       doc: undefined,
       cover: undefined,
       author: undefined,
       book_name: undefined,
-      progress: 0,
       total: 0,
-      paid: false,
-      rank: []
+      rank: [],
+      guide: "",
+      introduction: ""
     }
   }
   handleSwipeUp(e) {
@@ -85,7 +83,23 @@ export class App extends React.Component {
             doc: "http://7xqzo9.com2.z0.glb.qiniucdn.com/epub/" + resp.ret.file,
             author: resp.ret.author,
             cover: "/" + resp.ret.cover,
-            book_name: resp.ret.name
+            book_name: resp.ret.name,
+            introduction: resp.ret.introduction,
+            guide: resp.ret.guide
+          })
+
+          wx.ready(function(){
+            wx.onMenuShareTimeline({
+              title: resp.ret.share.moment,
+              link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
+              imgUrl: resp.ret.share.img
+            });
+            wx.onMenuShareAppMessage({
+              title: resp.ret.share.title,
+              desc: resp.ret.share.body,
+              link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
+              imgUrl: resp.ret.share.img
+            })
           })
         }else{
           alert(resp);
@@ -116,19 +130,6 @@ export class App extends React.Component {
       'width': $(window).width()
     })
 
-    wx.ready(function(){
-      wx.onMenuShareTimeline({
-        title: shareTitleSingle,
-        link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
-        imgUrl: shareImg
-      });
-      wx.onMenuShareAppMessage({
-        title: shareTitle,
-        desc: shareDescription,
-        link: window.location.origin + "/" + self.state.id + "/share/" + localStorage.uid,
-        imgUrl: shareImg
-      })
-    })
 
   }
   reloadUserRank(){
@@ -366,12 +367,9 @@ class Introduction extends React.Component {
       <div id="introduction">
         <img className="introduction-cover" src="/introduction.png" />
         <div className="introduction-content">
-          <p>咦，你也来玩“一元读”游戏啦！</p>
-          <p>全网首发《太平洋大劫杀》唯一完整版</p>
-          <p>游戏规则：</p>
-          <p>Ａ.0元开始读，1元赏作者。</p>
-          <p>Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。你分享越多，越快读到大结局。</p>
-          <p>Ｃ.最快读完的前500名同学每人奖励10元。</p>
+          <pre>
+            {this.props.introduction}
+          </pre>
         </div>
         <div className="center-block">
           <button className="button center-block" onClick={this.handleStart.bind(this)}>读起！</button>
@@ -400,10 +398,9 @@ class Guide extends React.Component {
         return (<div className="cover-page" onClick={this.handleStart.bind(this)}>
             <div className="cover-body center-block">
                 <img className="cover" src={this.props.cover} />
-                <div className="book-name" >根据"鲁荣渔2682"号杀人事件</div>
-                <div className="book-name" >创作的非虚构作品</div>
-                <div className="book-author" >一幕让灵魂颤抖的人性罪恶</div>
-                <div className="book-author" >一曲社会底层人命运的悲歌</div>
+                <pre>
+                  {this.props.guide}
+                </pre>
             </div>
             <div className="cover-footer"></div>
             <div className="guide">
