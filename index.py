@@ -176,7 +176,7 @@ def accept_share(doc, uid):
 @login_required
 def user():
     uid = current_user.get_id()
-    return resp("ok", {"balance": redis.get("balance|%s" % uid), "name": redis.get("name|%s" % uid), "headimg": redis.get("headimg|%s" % uid), "paid": redis.exists("paid|%s" % uid)})
+    return resp("ok", {"balance": redis.get("balance|%s" % uid), "name": redis.get("name|%s" % uid), "headimg": redis.get("headimg|%s" % uid), "paid": False})
 
 @app.route("/api/authentication", methods=["GET"])
 def mp_login():
@@ -294,8 +294,6 @@ def wechat_payment_callback():
     match = re.search(r"<out_trade_no><!\[CDATA\[(.+)]]></out_trade_no>", r)
     user_id = match.group(1)[:24]
     redis.incr("balance|%s" % user_id, 1 * points_yuan)
-    if not redis.exists("paid|%s" % user_id):
-        redis.set("paid|%s" % user_id, True)
     content = '''
     <xml>
       <return_code><![CDATA[SUCCESS]]></return_code>
