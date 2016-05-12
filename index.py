@@ -17,10 +17,10 @@ from datetime import *
 from dateutil.tz import *
 
 redis_zs = redis.StrictRedis(host="10.172.252.228", password="wod0Iv9eel6nuk0hI7hY", decode_responses=True, db=0)
-redis = redis.StrictRedis(host="10.172.252.228", password="wod0Iv9eel6nuk0hI7hY", decode_responses=True, db=1)
+redis = redis.StrictRedis(host="192.168.1.33", decode_responses=True, db=1)
 
 app = Flask(__name__, static_folder='public', static_url_path='')
-app.config['DEBUG'] = False
+app.config['DEBUG'] = True
 login_manager = LoginManager()
 login_manager.init_app(app)
 points_yuan = 10000
@@ -40,16 +40,37 @@ doc_dict = {
             "body": "中国著名法律记者郭国松根据“鲁荣渔2682”号杀人事件创作的非虚构作品",
             "img": "http://7xizu1.com1.z0.glb.clouddn.com/@/image/572fc733e4b06db6a571729b.jpg"
         },
-        "introduction": """咦，你也来玩“一元读”游戏啦！
+        "introduction": """咦，你也来玩“赞赏阅读”啦！
 全网首发《太平洋大劫杀》唯一完整版
-游戏规则：
-Ａ.0元开始读，1元赏作者。
-Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。你分享越多，越快读到大结局。
+赞赏规则：
+Ａ.0元开始，边读边赏。
+Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。
 Ｃ.最快读完的前500名同学每人奖励10元。""",
         "guide": """根据"鲁荣渔2682"号杀人事件
 创作的非虚构作品
 一幕让灵魂颤抖的人性罪恶
 一曲社会底层人命运的悲歌"""
+    },
+
+    "573441123001a5bbb14af866": {
+        "file": "chujia.epub", 
+        "author": "张忌",
+        "cover": "chujia.png",
+        "name": "出家",
+        "price": 12 * points_yuan,
+        "share_rate": 0.2,
+        "share": {
+            "moment": "一部当代版的《活着》：人世是否真的无可眷恋，出世能否真正获得新生？",
+            "title": "《出家》：当代版的《活着》",
+            "body": "张忌著，《收获》杂志推荐作品",
+            "img": "http://7xizu1.com1.z0.glb.clouddn.com/@/image/573442dfe4b06d72138d2965.png"
+        },
+        "introduction": """咦，你也来玩“赞赏阅读”啦！
+全网首发《出家》
+赞赏规则：
+Ａ.0元开始，边读边赏。
+Ｂ.分享赢分成。每个朋友通过你的分享开始阅读，你就能获得分成。""",
+        "guide": "年轻人方泉希望通过努力抵达他所向往的理想生活。渐渐的，他发现自己的想法只是虚妄。在失望中，一场意外的佛事活动，又让他察觉到了生活的另一种可能性。终于，他出家当了一名真正的和尚。遁入空门的方泉似乎又被更大的精神困惑所包围……"
     }
 }
 appid="wx6a3e59d1061ba5b4"
@@ -533,4 +554,4 @@ def resp(code, ret = {}):
     return resp
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8083)
+    app.run(host="0.0.0.0", port=80)

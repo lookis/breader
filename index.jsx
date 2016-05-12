@@ -478,7 +478,6 @@ class PaymentPage extends React.Component {
       return (<div className="payment">
         <div className="payment-top center-block">
             <p>赞赏一下作者吧！</p>
-            <p>公告：本游戏不接受超过1元的充值哦。</p>
             <div>
               <a className="button" onClick={this.handleGoBack.bind(this)}>1块也没有:(</a>
               <a className="button" onClick={this.handlePayment.bind(this)}>正好有1块:)</a>
